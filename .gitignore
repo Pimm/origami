@@ -1,0 +1,4 @@
+library/*
+!library/src
+tests/*
+!tests/src
