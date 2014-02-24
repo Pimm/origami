@@ -36,11 +36,11 @@ public class OrigamiDrawerBuilder implements OrigamiBuilder<FrameDrawer[]> {
 				path.close();
 			}
 			@Override
-			public final void addLine(float x, float y) {
+			public final void addLine(float x, float y, int exactX, int exactY) {
 				path.lineTo(x, y);
 			}
 			@Override
-			public final void addMove(float x, float y) {
+			public final void addMove(float x, float y, int exactX, int exactY) {
 				path.moveTo(x, y);
 			}
 			@Override

@@ -97,8 +97,6 @@ public class OrigamiReader {
 			}
 			final PolygonBuilder polygonBuilder = builder.createPolygonBuilder();
 			readPolygon(parser, polygonBuilder);
-			// (A path implicitly ends with a "close" instruction.)
-			polygonBuilder.addClose();
 			polygonBuilder.build();
 		}
 		parser.require(XmlPullParser.END_TAG, NAMESPACE, "frame");
@@ -125,8 +123,8 @@ public class OrigamiReader {
 		// Read the contents of the polygon.
 		{
 			byte currentlyReadingInstructionType = Byte.MIN_VALUE;
-			float currentlyReadingInstructionX = Float.NaN;
-			float currentlyReadingInstructionY = Float.NaN;
+			int currentlyReadingInstructionExactX = Integer.MIN_VALUE;
+			int currentlyReadingInstructionExactY = Integer.MIN_VALUE;
 			while (XmlPullParser.END_TAG != parser.next() || Byte.MIN_VALUE != currentlyReadingInstructionType) {
 				switch (parser.getEventType()) {
 				case XmlPullParser.START_TAG:
@@ -162,10 +160,9 @@ public class OrigamiReader {
 					} catch (NumberFormatException exception) {
 						throw new XmlPullParserException("A hexadecimal integer is expected, but not found", parser, null);
 					}
-					// Convert the two 12-bit coordinates, which are joined together in the integer above, to floats in the
-					// [0…1] range.
-					currentlyReadingInstructionX = ((coordinates >>> 12) & 0xFFF) / (4096f - 1);
-					currentlyReadingInstructionY = ((coordinates >>> 0) & 0xFFF) / (4096f - 1);
+					// Separate the two 12-bit coordinates, which are joined together in the integer above.
+					currentlyReadingInstructionExactX = (coordinates >>> 12) & 0xFFF;
+					currentlyReadingInstructionExactY = (coordinates >>> 0) & 0xFFF;
 					break;
 				}
 				case XmlPullParser.END_TAG:
@@ -178,11 +175,15 @@ public class OrigamiReader {
 					switch (currentlyReadingInstructionType) {
 					case INSTRUCTION_TYPE_MOVE:
 						parser.require(XmlPullParser.END_TAG, NAMESPACE, "move");
-						builder.addMove(currentlyReadingInstructionX, currentlyReadingInstructionY);
+						builder.addMove(currentlyReadingInstructionExactX / (4096f - 1),
+								currentlyReadingInstructionExactY / (4096f - 1),
+								currentlyReadingInstructionExactX, currentlyReadingInstructionExactY);
 						break;
 					case INSTRUCTION_TYPE_LINE:
 						parser.require(XmlPullParser.END_TAG, NAMESPACE, "line");
-						builder.addLine(currentlyReadingInstructionX, currentlyReadingInstructionY);
+						builder.addLine(currentlyReadingInstructionExactX / (4096f - 1),
+								currentlyReadingInstructionExactY / (4096f - 1),
+								currentlyReadingInstructionExactX, currentlyReadingInstructionExactY);
 						break;
 					case INSTRUCTION_TYPE_CLOSE:
 						parser.require(XmlPullParser.END_TAG, NAMESPACE, "close");
@@ -198,6 +199,8 @@ public class OrigamiReader {
 				}
 			}
 		}
+		// (A polygon implicitly ends with a "close" instruction.)
+		builder.addClose();
 		parser.require(XmlPullParser.END_TAG, NAMESPACE, "polygon");
 	}
 }
