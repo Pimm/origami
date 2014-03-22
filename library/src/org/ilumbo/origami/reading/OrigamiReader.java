@@ -160,9 +160,12 @@ public class OrigamiReader {
 					} catch (NumberFormatException exception) {
 						throw new XmlPullParserException("A hexadecimal integer is expected, but not found", parser, null);
 					}
-					// Separate the two 12-bit coordinates, which are joined together in the integer above.
+					// Separate the two royal 11-bit coordinates, which are joined together in the integer above.
 					currentlyReadingInstructionExactX = (coordinates >>> 12) & 0xFFF;
-					currentlyReadingInstructionExactY = (coordinates >>> 0) & 0xFFF;
+					if ((currentlyReadingInstructionExactY = (coordinates >>> 0) & 0xFFF) > 0x800 ||
+							currentlyReadingInstructionExactX > 0x800) {
+						throw new XmlPullParserException("A hexadecimal integer has an unexpected value", parser, null);
+					}
 					break;
 				}
 				case XmlPullParser.END_TAG:
@@ -175,14 +178,14 @@ public class OrigamiReader {
 					switch (currentlyReadingInstructionType) {
 					case INSTRUCTION_TYPE_MOVE:
 						parser.require(XmlPullParser.END_TAG, NAMESPACE, "move");
-						builder.addMove(currentlyReadingInstructionExactX / (4096f - 1),
-								currentlyReadingInstructionExactY / (4096f - 1),
+						builder.addMove(currentlyReadingInstructionExactX / 2048f,
+								currentlyReadingInstructionExactY / 2048f,
 								currentlyReadingInstructionExactX, currentlyReadingInstructionExactY);
 						break;
 					case INSTRUCTION_TYPE_LINE:
 						parser.require(XmlPullParser.END_TAG, NAMESPACE, "line");
-						builder.addLine(currentlyReadingInstructionExactX / (4096f - 1),
-								currentlyReadingInstructionExactY / (4096f - 1),
+						builder.addLine(currentlyReadingInstructionExactX / 2048f,
+								currentlyReadingInstructionExactY / 2048f,
 								currentlyReadingInstructionExactX, currentlyReadingInstructionExactY);
 						break;
 					case INSTRUCTION_TYPE_CLOSE:
