@@ -166,11 +166,11 @@ public final class OrigamiCleaner implements OrigamiBuilder<String> {
 		private final StringBuilder cleanDocumentBuilder;
 		public FrameCleaner(StringBuilder cleanDocumentBuilder) {
 			(this.cleanDocumentBuilder = cleanDocumentBuilder)
-					.append("<frame>");
+					.append("\t<frame>");
 		}
 		@Override
 		public final void build() {
-			cleanDocumentBuilder.append("</frame>");
+			cleanDocumentBuilder.append("</frame>\n");
 		}
 		@Override
 		public final PolygonBuilder createPolygonBuilder() {
@@ -183,7 +183,7 @@ public final class OrigamiCleaner implements OrigamiBuilder<String> {
 	private final StringBuilder cleanDocumentBuilder;
 	public OrigamiCleaner() {
 		(cleanDocumentBuilder = new StringBuilder(128))
-				.append("<origami>");
+				.append("<origami>\n");
 	}
 	@Override
 	public final String build() {
