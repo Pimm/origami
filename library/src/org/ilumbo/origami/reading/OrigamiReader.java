@@ -13,6 +13,9 @@ import android.util.Xml;
 /**
  * Reads origami documents. This class does not create a data structure for the document. Instead, it relies on a builder to
  * turn the data into a useful format.
+ *
+ * An origami reader does not have any internal state that would make it unsafe to re-use when reading multiple documents. (The
+ * builder, however, probably does have such internal state.)
  */
 public class OrigamiReader {
 	/**

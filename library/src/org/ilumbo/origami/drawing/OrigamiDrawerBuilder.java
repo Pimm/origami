@@ -23,13 +23,16 @@ public class OrigamiDrawerBuilder implements OrigamiBuilder<FrameDrawer[]> {
 			/**
 			 * The paint, which is part of the result.
 			 */
-			private Paint paint;
+			protected Paint paint;
 			/**
 			 * The path, which is part of the result.
 			 */
 			private final Path path;
 			public PathPaintBuilder() {
 				path = new Path();
+			}
+			public PathPaintBuilder(Path path) {
+				this.path = path;
 			}
 			@Override
 			public final void addClose() {
@@ -52,6 +55,13 @@ public class OrigamiDrawerBuilder implements OrigamiBuilder<FrameDrawer[]> {
 			public final void setFill(int lightness, int alpha) {
 				paint = getSharedPaint(lightness, alpha);
 			}
+			/**
+			 * If you already know the paint instance which will be returned getSharedPaint, might as well call this method
+			 * directly.
+			 */
+			protected final void setFill(Paint paint) {
+				this.paint = paint;
+			}
 		}
 		/**
 		 * The paints that will appear in the resulting frame drawer. This list is a sibeling of the one below. A paint with an
@@ -69,6 +79,7 @@ public class OrigamiDrawerBuilder implements OrigamiBuilder<FrameDrawer[]> {
 		}
 		@Override
 		public final void build() {
+			// Convert the lists to arrays.
 			Path[] paths = new Path[pathList.size()];
 			paths = pathList.toArray(paths);
 			Paint[] paints = new Paint[paintList.size()];
@@ -94,6 +105,7 @@ public class OrigamiDrawerBuilder implements OrigamiBuilder<FrameDrawer[]> {
 	}
 	@Override
 	public final FrameDrawer[] build() {
+		// Convert the list to an array.
 		FrameDrawer[] frameDrawers = new FrameDrawer[frameDrawerList.size()];
 		frameDrawers = frameDrawerList.toArray(frameDrawers);
 		return frameDrawers;

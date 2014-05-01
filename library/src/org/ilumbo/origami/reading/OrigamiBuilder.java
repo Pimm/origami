@@ -23,11 +23,15 @@ public interface OrigamiBuilder<Result> {
 			public void addMove(float x, float y, int exactX, int exactY);
 			/**
 			 * Completes the polygon, and perhaps adds said polygon to a list or something.
+			 *
+			 * After this method is called, add(Close|Line|Move) and setFill must no longer be called.
 			 */
 			public void build();
 			/**
 			 * Sets the properties of the fill. Both arguments are 0…255 (inclusive), where 0 is black or completely
 			 * transparent and 255 is white or completely opaque.
+			 *
+			 * This method must always be called before add(Close|Line|Move) and build.
 			 */
 			public void setFill(int lightness, int alpha);
 		}
