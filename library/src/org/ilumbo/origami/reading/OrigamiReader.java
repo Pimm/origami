@@ -18,6 +18,21 @@ import org.xmlpull.v1.XmlPullParserFactory;
  */
 public class OrigamiReader {
 	/**
+	 * An exception that is thrown when the format of an origami document is no good.
+	 */
+	public final static class OrigamiDocumentFormatException extends Exception {
+		private static final long serialVersionUID = 0x5044C6586A8302E3L;
+		public OrigamiDocumentFormatException(XmlPullParserException cause) {
+			super(cause);
+		}
+		/**
+		 * {@inheritDoc}
+		 */
+		public final XmlPullParserException getCause() {
+			return (XmlPullParserException) super.getCause();
+		}
+	}
+	/**
 	 * The instruction type for closes.
 	 */
 	private static final byte INSTRUCTION_TYPE_CLOSE = 2;
@@ -63,18 +78,18 @@ public class OrigamiReader {
 	 * Reads an origami document from the passed input stream. The passed builder receives the data in the document, and flows
 	 * it into some kind of data structure. Said "some kind of data structure" is returned.
 	 */
-	public Object read(InputStream inputStream, OrigamiBuilder<?> builder) {
+	public Object read(InputStream inputStream, OrigamiBuilder<?> builder) throws OrigamiDocumentFormatException, IOException {
+		// Create the parser.
 		final XmlPullParser parser = createXmlPullParser();
 		try {
+			// Inject the input stream into the parser.
 			parser.setInput(inputStream, "UTF_8");
 			// Read the very first element start tag.
 			parser.next();
 			// Read the document.
 			readDocument(parser, builder);
 		} catch (XmlPullParserException exception) {
-			exception.printStackTrace();
-		} catch (IOException exception) {
-			exception.printStackTrace();
+			throw new OrigamiDocumentFormatException(exception);
 		}
 		// Return the resulting data structure.
 		return builder.build();
