@@ -7,8 +7,7 @@ import org.ilumbo.origami.reading.OrigamiBuilder.FrameBuilder;
 import org.ilumbo.origami.reading.OrigamiBuilder.FrameBuilder.PolygonBuilder;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import android.util.Xml;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 /**
  * Reads origami documents. This class does not create a data structure for the document. Instead, it relies on a builder to
@@ -38,18 +37,27 @@ public class OrigamiReader {
 	 * Creates a new XML pull parser.
 	 */
 	protected static XmlPullParser createXmlPullParser() {
-		final XmlPullParser result = Xml.newPullParser();
+		final XmlPullParserFactory factory;
+		try {
+			factory = XmlPullParserFactory.newInstance();
+		} catch (XmlPullParserException exception) {
+			throw new RuntimeException(exception);
+		}
 		// Set the features of the resulting parser.
 		try {
-			result.setFeature(XmlPullParser.FEATURE_PROCESS_DOCDECL, false);
-			result.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+			factory.setFeature(XmlPullParser.FEATURE_PROCESS_DOCDECL, false);
+			factory.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
 		// The above might raise an exception, but this is highly unlikely. Those features should be false by default, and even
 		// if that were not the case setting them to false should not be a problem. Throw a runtime exception in this
 		// exceptional situation.
 		} catch (XmlPullParserException exception) {
 			throw new RuntimeException(exception);
 		}
-		return result;
+		try {
+			return factory.newPullParser();
+		} catch (XmlPullParserException exception) {
+			throw new RuntimeException(exception);
+		}
 	}
 	/**
 	 * Reads an origami document from the passed input stream. The passed builder receives the data in the document, and flows
