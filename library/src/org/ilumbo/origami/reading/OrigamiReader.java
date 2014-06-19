@@ -85,7 +85,9 @@ public class OrigamiReader {
 			// Inject the input stream into the parser.
 			parser.setInput(inputStream, "UTF_8");
 			// Read the very first element start tag.
-			parser.next();
+			do {
+				parser.next();
+			} while (XmlPullParser.START_DOCUMENT == parser.getEventType());
 			// Read the document.
 			readDocument(parser, builder);
 		} catch (XmlPullParserException exception) {
