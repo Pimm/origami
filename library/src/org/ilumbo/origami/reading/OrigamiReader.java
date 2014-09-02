@@ -93,6 +93,12 @@ public class OrigamiReader {
 		} catch (XmlPullParserException exception) {
 			throw new OrigamiDocumentFormatException(exception);
 		}
+		// Close the input stream.
+		try {
+			inputStream.close();
+		} catch (IOException exception) {
+			android.util.Log.w(OrigamiReader.class.getSimpleName(), exception);
+		}
 		// Return the resulting data structure.
 		return builder.build();
 	}
